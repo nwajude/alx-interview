@@ -1,40 +1,45 @@
 #!/usr/bin/python3
-"""0-stats module
-"""
+
+""" script that reads stdin line by line and computes metrics """
+
 import sys
 
 
-stats = {
-    '200': 0, '301': 0, '400': 0, '401': 0,
-    '403': 0, '404': 0, '405': 0, '500': 0
-}
-total = 0
+def printsts(dic, size):
+    """ WWPrints information """
+    print("File size: {:d}".format(size))
+    for i in sorted(dic.keys()):
+        if dic[i] != 0:
+            print("{}: {:d}".format(i, dic[i]))
+
+
+sts = {"200": 0, "301": 0, "400": 0, "401": 0, "403": 0,
+       "404": 0, "405": 0, "500": 0}
+
 count = 0
+size = 0
+
+try:
+    for line in sys.stdin:
+        if count != 0 and count % 10 == 0:
+            printsts(sts, size)
+
+        stlist = line.split()
+        count += 1
+
+        try:
+            size += int(stlist[-1])
+        except:
+            pass
+
+        try:
+            if stlist[-2] in sts:
+                sts[stlist[-2]] += 1
+        except:
+            pass
+    printsts(sts, size)
 
 
-def print_stats(stats, total):
-    """print_stats function
-    """
-    print("File size: {}".format(total))
-    for key, value in sorted(stats.items()):
-        if value != 0:
-            print("{}: {}".format(key, value))
-
-
-if __name__ == "__main__":
-    try:
-        for line in sys.stdin:
-            data = line.split()
-            if len(data) > 4:
-                status = data[-2]
-                if status in stats.keys():
-                    stats[status] += 1
-                total += int(data[-1])
-                count += 1
-            if count == 10:
-                count = 0
-                print_stats(stats, total)
-    except Exception:
-        pass
-    finally:
-        print_stats(stats, total)
+except KeyboardInterrupt:
+    printsts(sts, size)
+    raise
